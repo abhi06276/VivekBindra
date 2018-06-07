@@ -15,10 +15,12 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 public class MainApplication extends Application {
     private static final String TAG = MainApplication.class.getSimpleName();
+    private static MainApplication mInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mInstance = this;
         AndroidNetworking.initialize(getApplicationContext());
     }
 
@@ -31,5 +33,14 @@ public class MainApplication extends Application {
                 build();
 
         ImageLoader.getInstance().init(defaultConfig);
+    }
+
+
+    public static synchronized MainApplication getInstance() {
+        return mInstance;
+    }
+
+    public void setConnectivityListener(Connectivity.ConnectivityReceiverListener listener) {
+        Connectivity.connectivityReceiverListener = listener;
     }
 }

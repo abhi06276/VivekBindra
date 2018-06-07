@@ -4,5 +4,8 @@
     <string name="rate_us">Rate the App</string>
     <string name="title">Vivek Bindra</string>
     <string name="title_activity_splash">Vivek Bindra University And Motivational Videos</string>
+    <string name="no_internet">You are offline,Please connect to the Internet</string>
+    <string name="appstore_url">https://play.google.com/store/apps/details?id=com.contentsapp.sancsvision.contentsapp</string>
+
 
 </resources>

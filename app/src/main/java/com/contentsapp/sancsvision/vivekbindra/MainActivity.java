@@ -1,10 +1,14 @@
 package com.contentsapp.sancsvision.vivekbindra;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -26,13 +31,15 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Connectivity.ConnectivityReceiverListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     DrawerLayout mDrawerLayout = null;
     ListView listView = null;
     ProgressBar progressBar = null;
+    SwipeRefreshLayout pullToRefresh = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -48,12 +55,23 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#00ffffff'>Vivek Bindra </font>"));
         listView = findViewById(R.id.list_view);
         progressBar = findViewById(R.id.progressBar);
+        pullToRefresh = findViewById(R.id.pullToRefresh);
 
 
 
         this.callAPIToGetContentList();
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorAccent);
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+
+            @Override
+            public void onRefresh() {
+                callAPIToGetContentList();
+            }
+        });
+
 
         mDrawerLayout.addDrawerListener(
                 new DrawerLayout.DrawerListener() {
@@ -92,10 +110,30 @@ public class MainActivity extends AppCompatActivity {
                         if(menuItem.toString().equals("Contact Us")){
                             launchEmailApp();
                         }
+
+                        else if(menuItem.toString().equals("Rate the App")){
+                            reviewApp();
+                        }
+
                         return true;
                     }
                 });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        Connectivity connectivityReceiver = new Connectivity();
+        registerReceiver(connectivityReceiver, intentFilter);
+
+        /*register connection status listener*/
+        if(MainApplication.getInstance() != null) {
+            MainApplication.getInstance().setConnectivityListener(this);
+        }
     }
 
     void launchEmailApp(){
@@ -110,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(emailIntent);
     }
 
+    void reviewApp() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="+getPackageName())));
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -128,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
         if(progressBar != null){
             progressBar.bringToFront();
             progressBar.setVisibility(View.VISIBLE);
+            pullToRefresh.setRefreshing(true);
+
         }
         Log.d(TAG,"API to call is "+Constants.BASE_URL+Constants.GET_CONTENTS_LIST);
         AndroidNetworking.get(Constants.BASE_URL+Constants.GET_CONTENTS_LIST).
@@ -139,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 initListContents(response);
                 if(progressBar != null){
                     progressBar.setVisibility(View.GONE);
+                    pullToRefresh.setRefreshing(false);
                 }
             }
 
@@ -157,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         final ArrayList<String> listdata = new ArrayList<String>();
         JSONArray jArray = (JSONArray)response;
         if (jArray != null) {
-            for (int i=0;i<jArray.length();i++){
+            for (int i=jArray.length();i>0;i--){
                 try {
                     listdata.add(jArray.getString(i));
                 } catch (JSONException e) {
@@ -179,5 +223,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = Connectivity.isConnected();
+    }
 
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+
+        if(!isConnected) {
+            Toast.makeText(this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+        }
+
+    }
 }
