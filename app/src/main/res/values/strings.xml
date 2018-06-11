@@ -8,4 +8,11 @@
     <string name="appstore_url">https://play.google.com/store/apps/details?id=com.contentsapp.sancsvision.contentsapp</string>
 
 
+    <!-- AdMob ad unit IDs -->
+    <string name="admob_app_id">ca-app-pub-1080071348247490~7397735419</string>
+    <string name="banner_home_footer">ca-app-pub-1080071348247490/9330119403</string>
+    <!--<string name="banner_home_footer">ca-app-pub-3940256099942544/6300978111</string>-->
+    <string name="interstitial_full_screen">ca-app-pub-XXXXXXXX~XXXXXXXXXXX</string>
+    <string name="rewarded_video">ca-app-pub-XXXXXXXX~XXXXXXXXXXX</string>
+
 </resources>

@@ -25,6 +25,9 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements Connectivity.Conn
     ListView listView = null;
     ProgressBar progressBar = null;
     SwipeRefreshLayout pullToRefresh = null;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements Connectivity.Conn
 
 
         this.callAPIToGetContentList();
+        this.showAds();
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorAccent);
 
@@ -134,6 +140,27 @@ public class MainActivity extends AppCompatActivity implements Connectivity.Conn
         if(MainApplication.getInstance() != null) {
             MainApplication.getInstance().setConnectivityListener(this);
         }
+
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
     }
 
     void launchEmailApp(){
@@ -201,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements Connectivity.Conn
         final ArrayList<String> listdata = new ArrayList<String>();
         JSONArray jArray = (JSONArray)response;
         if (jArray != null) {
-            for (int i=jArray.length();i>0;i--){
+            for (int i=jArray.length()-1;i>0;i--){
                 try {
                     listdata.add(jArray.getString(i));
                 } catch (JSONException e) {
@@ -221,6 +248,47 @@ public class MainActivity extends AppCompatActivity implements Connectivity.Conn
             }
         });
 
+    }
+
+    //-------------------------------- Show Ads ------------------------------------------------
+
+    void showAds(){
+        mAdView = findViewById(R.id.adView);
+//        mAdView.setAdSize(AdSize.BANNER);
+//        mAdView.setAdUnitId(getString(R.string.banner_home_footer));
+        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                // Check the LogCat to get your test device ID
+                .addTestDevice("652F3E726F4068AD8851F5B9D40E8C7E")
+                .build();
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+            }
+
+            @Override
+            public void onAdClosed() {
+//                Toast.makeText(getApplicationContext(), "Ad is closed!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+//                Toast.makeText(getApplicationContext(), "Ad failed to load! error code: " + errorCode, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+//                Toast.makeText(getApplicationContext(), "Ad left application!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+            }
+        });
+
+        mAdView.loadAd(adRequest);
     }
 
     // Method to manually check connection status

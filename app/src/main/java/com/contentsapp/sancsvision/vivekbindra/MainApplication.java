@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.androidnetworking.AndroidNetworking;
+import com.google.android.gms.ads.MobileAds;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -22,6 +23,8 @@ public class MainApplication extends Application {
         super.onCreate();
         mInstance = this;
         AndroidNetworking.initialize(getApplicationContext());
+        MobileAds.initialize(this, getString(R.string.admob_app_id));
+
     }
 
     public static void configureDefaultImageLoader(Context context){

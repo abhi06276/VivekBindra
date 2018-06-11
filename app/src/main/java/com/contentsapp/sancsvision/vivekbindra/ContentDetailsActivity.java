@@ -20,6 +20,9 @@ import android.widget.TextView;
 
 import com.contentsapp.sancsvision.vivekbindra.utils.FullScreenManager;
 import com.contentsapp.sancsvision.vivekbindra.utils.YouTubeDataEndpoint;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.pierfrancescosoffritti.youtubeplayer.player.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.youtubeplayer.player.YouTubePlayer;
 import com.pierfrancescosoffritti.youtubeplayer.player.YouTubePlayerFullScreenListener;
@@ -46,6 +49,8 @@ public class ContentDetailsActivity extends AppCompatActivity {
     TextView title = null;
     TextView description = null;
     ImageButton shareButton = null;
+    private AdView mAdView;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -70,6 +75,7 @@ public class ContentDetailsActivity extends AppCompatActivity {
         }
         youTubePlayerView = findViewById(R.id.youtube_player_view);
         initYouTubePlayerView();
+        this.showAds();
 
 
         Window window = this.getWindow();
@@ -224,7 +230,66 @@ public class ContentDetailsActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
         super.onDestroy();
         youTubePlayerView.release();
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    void showAds(){
+        mAdView = findViewById(R.id.adView);
+//        mAdView.setAdSize(AdSize.BANNER);
+//        mAdView.setAdUnitId(getString(R.string.banner_home_footer));
+        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                // Check the LogCat to get your test device ID
+                .addTestDevice("652F3E726F4068AD8851F5B9D40E8C7E")
+                .build();
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+            }
+
+            @Override
+            public void onAdClosed() {
+//                Toast.makeText(getApplicationContext(), "Ad is closed!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+//                Toast.makeText(getApplicationContext(), "Ad failed to load! error code: " + errorCode, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+//                Toast.makeText(getApplicationContext(), "Ad left application!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+            }
+        });
+
+        mAdView.loadAd(adRequest);
     }
 }

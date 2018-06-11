@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -52,6 +53,7 @@
             android:layout_alignStart="@+id/textView_title"
             android:layout_below="@+id/textView_published_on"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="55dp"
             android:fontFamily="sans-serif"
             android:scrollbars = "vertical"
             android:maxLines="100"
@@ -70,6 +72,18 @@
             android:background="@android:drawable/screen_background_light_transparent"
             android:tint="@color/colorLightGrey"
             app:srcCompat="@drawable/ic_share" />
+
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_home_footer"
+            android:layout_alignParentBottom="true">
+        </com.google.android.gms.ads.AdView>
+
+
     </RelativeLayout>
 
 </RelativeLayout>
